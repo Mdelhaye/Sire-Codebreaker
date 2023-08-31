@@ -1,15 +1,15 @@
-//Import JS Library
+// Import JS Library
 const { SlashCommandBuilder, EmbedBuilder, escapeMarkdown } = require('discord.js');
 const { Client, Util }										= require('clashofclans.js');
 
 // Import Const Data
-const { apiToken }											= require('./../../config.json');
-const { ClanDescription, WarStats }							= require('./../../utils/customEmojis.js');
+const { clashOfClans }										= require('./../../../config.json');
+const { ClanDescription, WarStats }							= require('./../../../utils/customEmojis.js');
 
 // Import Utils functions
-const { getNbDaysSinceCreation, getMembersTownHallLevel, getMembersWarOptedIn, getCapitalAndDistrictsLevel, getMembersDonations } = require('./../../utils/clanUtils.js');
+const { getNbDaysSinceCreation, getMembersTownHallLevel, getMembersWarOptedIn, getCapitalAndDistrictsLevel, getMembersDonations } = require('./../../../utils/clanUtils.js');
 
-const clashOfClient = new Client({ keys: [apiToken]});
+const clashOfClient = new Client({ keys: [clashOfClans.apiToken]});
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -20,6 +20,8 @@ module.exports = {
 				.setDescription('identifiant de clan.')
 		),
 	async execute(interaction) {
+		console.log(interaction);
+
 		const clanTag 			= interaction.options.getString('tag');
 		const clanData			= await clashOfClient.getClan(Util.formatTag(`${clanTag}`));
 

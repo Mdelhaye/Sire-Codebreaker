@@ -1,3 +1,4 @@
+// Import JS Library
 const { Events } = require('discord.js');
 
 module.exports = {

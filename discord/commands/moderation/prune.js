@@ -1,3 +1,4 @@
+// Import JS Library
 const { SlashCommandBuilder } = require('discord.js');
 
 module.exports = {

@@ -1,11 +1,13 @@
 // Import des dépendances nécessaires
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
-const { token } 										= require('./config.json');
-const fs 												= require('node:fs');
-const path 												= require('node:path');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
+const { discord }								= require('./config.json');
+const fs										= require('node:fs');
+const path										= require('node:path');
+
+// ------------------------------------------------- Discord Part ------------------------------------------------- //
 
 // Création d'une instance du client Discord.js avec les intents spécifiées
-const client = new Client({
+const discordClient = new Client({
 	intents: [
 		GatewayIntentBits.Guilds,
 		GatewayIntentBits.GuildMessages,
@@ -13,15 +15,15 @@ const client = new Client({
 	]
 })
 
-client.commands = new Collection();
+discordClient.commands = new Collection();
 
-// Chargement des commandes à partir des fichiers dans le dossier "commands"
-const foldersPath = path.join(__dirname, 'commands');
-const commandFolders = fs.readdirSync(foldersPath);
+// Chargement des commandes à partir des fichiers dans le dossier "discord/commands"
+const discordCommandsFoldersPath 	= path.join(__dirname, 'discord/commands');
+const discordCommandsFolders 		= fs.readdirSync(discordCommandsFoldersPath);
 
-for (const folder of commandFolders)
+for (const folder of discordCommandsFolders)
 {
-	const commandsPath = path.join(foldersPath, folder);
+	const commandsPath = path.join(discordCommandsFoldersPath, folder);
 	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 	
 	for (const file of commandFiles)
@@ -32,7 +34,7 @@ for (const folder of commandFolders)
 		// Vérification si la commande a les propriétés requises : "data" et "execute"
         if ('data' in command && 'execute' in command)
 		{
-			client.commands.set(command.data.name, command);
+			discordClient.commands.set(command.data.name, command);
 		} 
 		else
 		{
@@ -41,28 +43,25 @@ for (const folder of commandFolders)
 	}
 }
 
-// Chargement des événements à partir des fichiers dans le dossier "events"
-const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+// Chargement des événements à partir des fichiers dans le dossier "discord/events"
+const discordEventsPath = path.join(__dirname, 'discord/events');
+const discordEventFiles = fs.readdirSync(discordEventsPath).filter(file => file.endsWith('.js'));
 
-for (const file of eventFiles) 
+for (const file of discordEventFiles) 
 {
-	const filePath = path.join(eventsPath, file);
+	const filePath = path.join(discordEventsPath, file);
 	const event    = require(filePath);
 	
 	// Liaison des événements au client Discord
     if (event.once) 
     {
-		client.once(event.name, (...args) => event.execute(...args));
+		discordClient.once(event.name, (...args) => event.execute(...args));
 	} 
     else 
     {
-		client.on(event.name, (...args) => event.execute(...args));
+		discordClient.on(event.name, (...args) => event.execute(...args));
 	}
 }
 
 // Connexion du bot à l'API de Discord en utilisant le token d'authentification
-client.login(token);
-
-// console.log(client.cooldowns);
-// exports.clientCooldowns = client.cooldowns;
+discordClient.login(discord.token);
